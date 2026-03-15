@@ -14,7 +14,7 @@ function Layout() {
   const { theme } = useAppStore()
   const isLight = theme === 'light'
   return (
-    <div className={`min-h-screen ${isLight ? 'bg-gray-100 text-gray-900' : 'bg-gray-950 text-white'}`}>
+    <div style={{ minHeight: '100vh', backgroundColor: isLight ? '#f3f4f6' : '#030712', color: isLight ? '#111827' : '#ffffff' }}>
       <TopBar />
       <NavBar />
       <main className="pb-20 pt-16 px-4 max-w-md mx-auto">
@@ -36,7 +36,7 @@ function App() {
   const isLight = theme === 'light'
   return (
     <Router>
-      <div className={`min-h-screen ${isLight ? 'bg-gray-100' : 'bg-gray-950'}`}>
+      <div style={{ minHeight: '100vh', backgroundColor: isLight ? '#f3f4f6' : '#030712' }}>
         <Routes>
           <Route path="/signin" element={<SignIn />} />
           <Route path="/*" element={<Layout />} />

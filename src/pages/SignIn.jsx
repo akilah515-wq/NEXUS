@@ -1,8 +1,8 @@
-import nexusLogo from '../assets/nexus-logo.jpeg'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Shield } from 'lucide-react'
 import useAppStore from '../store/useAppStore'
+import nexusLogo from '../assets/nexus-logo.png'
 
 export default function SignIn() {
   const [phone, setPhone] = useState('')
@@ -15,21 +15,42 @@ export default function SignIn() {
   const isLight = theme === 'light'
   const navigate = useNavigate()
 
-  const handleSignIn = () => {
-  if (!phone || pin.length < 4) return
-  setIsLoading(true)
-  setTimeout(() => {
-    setIsLoading(false)
-    const displayName = isNewUser && name.trim() ? name.trim() : 'Shantel Brown'
-    const firstName = displayName.split(' ')[0].toLowerCase()
-    setUser({
-      name: displayName,
-      phone: phone,
-      email: `${firstName}@nexus.jm`,
-    })
-    navigate('/home')
-  }, 1500)
-}
+  const handleSignIn = async () => {
+    if (!phone || pin.length < 4) return
+    setIsLoading(true)
+    try {
+      const endpoint = isNewUser ? '/api/auth/register' : '/api/auth/login'
+      const body = isNewUser
+        ? { name: name.trim() || 'User', email: `${phone}@nexus.jm`, password: pin, phone }
+        : { email: `${phone}@nexus.jm`, password: pin }
+
+      const res = await fetch(`${import.meta.env.VITE_API_URL}${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+
+      const data = await res.json()
+
+      if (data.success) {
+        localStorage.setItem('nexus_token', data.token)
+        const displayName = data.user.name || name.trim() || 'User'
+        const firstName = displayName.split(' ')[0].toLowerCase()
+        setUser({
+          name: displayName,
+          phone: phone,
+          email: data.user.email || `${firstName}@nexus.jm`,
+        })
+        navigate('/home')
+      } else {
+        alert(data.message || 'Something went wrong. Please try again.')
+      }
+    } catch (err) {
+      alert('Cannot connect to server. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className={`min-h-screen flex flex-col items-center justify-center px-6 ${
@@ -38,19 +59,13 @@ export default function SignIn() {
 
       {/* Logo */}
       <div className="flex flex-col items-center mb-10">
-  <img
-  src={nexusLogo}
-  alt="NEXUS Logo"
-  className="w-48 h-48 object-contain mb-2"
-  style={{
-    mixBlendMode: 'screen',
-    filter: 'brightness(1.2) contrast(1.1)',
-    borderRadius: '16px',
-    background: 'transparent',
-  }}
-/>
-  <p className="text-gray-400 text-sm mt-1">Jamaica's Financial Platform</p>
-</div>
+        <img
+          src={nexusLogo}
+          alt="NEXUS Logo"
+          className="w-44 h-44 object-contain"
+        />
+        <p className="text-gray-400 text-sm mt-1">Jamaica's Financial Platform</p>
+      </div>
 
       {/* Card */}
       <div className={`w-full max-w-sm rounded-2xl p-6 space-y-4 ${
@@ -99,8 +114,12 @@ export default function SignIn() {
             <input
               type="tel"
               value={phone}
-              onChange={e => setPhone(e.target.value)}
+              onChange={e => {
+                const numbersOnly = e.target.value.replace(/[^0-9]/g, '')
+                setPhone(numbersOnly)
+              }}
               placeholder="876 XXX XXXX"
+              maxLength={10}
               className={`flex-1 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-yellow-400 transition-colors ${
                 isLight
                   ? 'bg-gray-100 border border-gray-200 text-gray-900 placeholder-gray-400'
@@ -187,7 +206,7 @@ export default function SignIn() {
 
       {/* Demo skip */}
       <button
-        onClick={() => navigate('/')}
+        onClick={() => navigate('/home')}
         className="mt-4 text-gray-600 text-xs underline"
       >
         Skip — Demo Mode

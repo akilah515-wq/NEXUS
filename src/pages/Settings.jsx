@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Moon, Sun, Globe, Bell, Shield, ChevronRight, LogOut, Info, Check } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import useAppStore from '../store/useAppStore'
 
 const languages = [
@@ -28,11 +29,12 @@ function Toggle({ defaultValue }) {
 }
 
 export default function Settings() {
-  const { theme, setTheme, language, setLanguage, translations: t } = useAppStore()
+  const { theme, setTheme, language, setLanguage, translations: t, user } = useAppStore()
   const [showLangPicker, setShowLangPicker] = useState(false)
   const isLight = theme === 'light'
+  const navigate = useNavigate()
 
-  const currentLang = languages.find(l => l.code === language)
+  const currentLang = languages.find(l => l.code === language) || languages[0]
 
   const cardClass = isLight
     ? 'bg-white border border-gray-200 rounded-xl'
@@ -46,6 +48,8 @@ export default function Settings() {
 
   return (
     <div className="py-4 space-y-6">
+
+      {/* Header */}
       <div>
         <h1 className={`text-2xl font-bold ${textPrimary}`}>{t.settingsTitle}</h1>
         <p className={`text-sm mt-1 ${textSecondary}`}>{t.customise}</p>
@@ -53,10 +57,12 @@ export default function Settings() {
 
       {/* Profile card */}
       <div className={`${cardClass} p-4 flex items-center gap-4`}>
-        <div className="w-14 h-14 rounded-full bg-yellow-400 flex items-center justify-center text-gray-900 font-bold text-xl">S</div>
+        <div className="w-14 h-14 rounded-full bg-yellow-400 flex items-center justify-center text-gray-900 font-bold text-xl">
+          {user.name.charAt(0).toUpperCase()}
+        </div>
         <div>
-          <p className={`font-bold text-lg ${textPrimary}`}>Shantel Brown</p>
-          <p className={`text-sm ${textSecondary}`}>shantel@nexus.jm</p>
+          <p className={`font-bold text-lg ${textPrimary}`}>{user.name}</p>
+          <p className={`text-sm ${textSecondary}`}>{user.email}</p>
           <p className="text-emerald-400 text-xs mt-1">Health Score: 72 — {t.goodStanding}</p>
         </div>
       </div>
@@ -85,7 +91,7 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* Preferences section */}
+      {/* Preferences */}
       <div className={`${cardClass} overflow-hidden`}>
         <p className={`text-xs font-semibold uppercase tracking-wider px-4 pt-3 pb-2 ${textSecondary}`}>
           {t.preferences}
@@ -196,18 +202,22 @@ export default function Settings() {
 
       {/* Sign out */}
       <button
-  onClick={() => window.location.href = '/signin'}
-  className="w-full flex items-center justify-center gap-2 py-4 rounded-xl border border-red-500/30 text-red-400 text-sm font-medium hover:bg-red-500/5 transition-colors"
->
-  <LogOut size={16} />
-  {t.signOut}
-</button>
+        onClick={() => {
+          localStorage.removeItem('nexus_token')
+          navigate('/signin')
+        }}
+        className="w-full flex items-center justify-center gap-2 py-4 rounded-xl border border-red-500/30 text-red-400 text-sm font-medium hover:bg-red-500/5 transition-colors"
+      >
+        <LogOut size={16} />
+        {t.signOut}
+      </button>
 
       <div className="text-center pb-4">
         <p className={`text-xs ${isLight ? 'text-gray-400' : 'text-gray-700'}`}>
           NEXUS — Built for Jamaica. Built for Everyone.
         </p>
       </div>
+
     </div>
   )
 }
