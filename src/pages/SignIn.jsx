@@ -15,41 +15,20 @@ export default function SignIn() {
   const isLight = theme === 'light'
   const navigate = useNavigate()
 
-  const handleSignIn = async () => {
+  const handleSignIn = () => {
     if (!phone || pin.length < 4) return
     setIsLoading(true)
-    try {
-      const endpoint = isNewUser ? '/api/auth/register' : '/api/auth/login'
-      const body = isNewUser
-        ? { name: name.trim() || 'User', email: `${phone}@nexus.jm`, password: pin, phone }
-        : { email: `${phone}@nexus.jm`, password: pin }
-
-      const res = await fetch(`${import.meta.env.VITE_API_URL}${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      })
-
-      const data = await res.json()
-
-      if (data.success) {
-        localStorage.setItem('nexus_token', data.token)
-        const displayName = data.user.name || name.trim() || 'User'
-        const firstName = displayName.split(' ')[0].toLowerCase()
-        setUser({
-          name: displayName,
-          phone: phone,
-          email: data.user.email || `${firstName}@nexus.jm`,
-        })
-        navigate('/home')
-      } else {
-        alert(data.message || 'Something went wrong. Please try again.')
-      }
-    } catch (err) {
-      alert('Cannot connect to server. Please try again.')
-    } finally {
+    setTimeout(() => {
       setIsLoading(false)
-    }
+      const displayName = isNewUser && name.trim() ? name.trim() : 'Shantel Brown'
+      const firstName = displayName.split(' ')[0].toLowerCase()
+      setUser({
+        name: displayName,
+        phone: phone,
+        email: `${firstName}@nexus.jm`,
+      })
+      navigate('/home')
+    }, 1500)
   }
 
   return (

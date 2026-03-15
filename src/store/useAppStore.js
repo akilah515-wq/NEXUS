@@ -273,6 +273,8 @@ const useAppStore = create((set) => ({
     email: 'shantel@nexus.jm',
   },
   setUser: (user) => set({ user }),
+setTheme: (theme) => set({ theme }),
+setLanguage: (lang) => set({ language: lang, translations: translations[lang] || translations.en }),
   }),
 )
 

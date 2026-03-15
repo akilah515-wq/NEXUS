@@ -6,13 +6,13 @@ export default function TopBar() {
   const isLight = theme === 'light'
 
   return (
-    <div className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-center py-1 border-b ${
-      isLight ? 'bg-white border-gray-200' : 'bg-gray-900 border-gray-800'
+    <div className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-center ${
+      isLight ? 'bg-gray-100' : 'bg-gray-950'
     }`}>
       <img
         src={nexusLogo}
         alt="NEXUS"
-        className="h-12 object-contain"
+        className="h-40 object-contain"
       />
     </div>
   )
