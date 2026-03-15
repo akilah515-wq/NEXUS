@@ -1,0 +1,8 @@
+/* stylelint-disable */
+@import "tailwindcss";
+
+@theme {
+  --color-gold-400: #FBBF24;
+  --color-gold-500: #F59E0B;
+  --color-gold-600: #D97706;
+}
